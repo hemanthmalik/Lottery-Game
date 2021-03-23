@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from . import models as main_models
+from django.core.exceptions import ValidationError
 # from django.contrib.auth.models import User
 # Create your views here.
 
@@ -21,16 +22,19 @@ User = get_user_model()
 @api_view(['POST'])
 @parser_classes((JSONParser,))
 def register(request):
-    response = {'success': False, 'detail': 'Please, provide all credentials!'}
+    response = {'success': False, 'detail': 'Please, provide requested credentials!'}
 
     data = request.data
     name = data.get('name')
-    phone = data.get('phone')
-    email = data.pop('email')
+    phone = data.pop('phone')
+    email = data.get('email')
     password = data.pop('password')
 
-    if name and phone and email and password:
-        User.objects.create_user(email, password, **data)
+    if name and phone and password:
+        try:
+            User.objects.create_user(phone, password, **data)
+        except ValidationError as e:
+            return Response({'success':False, 'detail': e})
         response = {'success': True, 'detail': 'Registration Successful.'}
     
     return Response(response)
@@ -45,9 +49,11 @@ class CustomAuthToken(ObtainAuthToken):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         return Response({
+            'id': user.pk,
+            'name': user.name,
+            'email': user.email,
+            'phone': user.phone,
             'token': token.key,
-            'user_id': user.pk,
-            'email': user.email
         })
 
     
@@ -57,5 +63,7 @@ class ValidateAddMoney(APIView):
 
     def post(self, request, format=None):
         data = request.data
-        main_models.AddedMoney.objects.create(amount=data.get('amount'), reference_number=data.get('ref_number'), user=request.user)
-        return Response({'success': True, 'detail': 'Money sent for validation!'})
+        ref_number = data.get('ref_number')
+        amount = data.get('amount')
+        main_models.AddedAmount.objects.create(amount=amount, reference_number=ref_number, user=request.user)
+        return Response({'success': True, 'detail': 'Payment validation in progress!'})
