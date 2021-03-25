@@ -67,3 +67,16 @@ class ValidateAddMoney(APIView):
         amount = data.get('amount')
         main_models.AddedAmount.objects.create(amount=amount, reference_number=ref_number, user=request.user)
         return Response({'success': True, 'detail': 'Payment validation in progress!'})
+
+class PlaceBet(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        data = request.data
+        bet_amount = data.get('bet_amount')
+        if request.user.balance < bet_amount:
+            return Response({'success': False, 'detail': 'Insufficient Balance!'})
+        bet_digit = data.get('bet_digit')
+        main_models.Bet.objects.create(amount=bet_amount, number=bet_digit, user=request.user)
+        return Response({'success': True, 'detail': 'Bet has been placed!'})
