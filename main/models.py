@@ -8,9 +8,9 @@ from .managers import CustomUserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    name = models.CharField(max_length=60, default='')
+    name = models.CharField(max_length=60)
     phone = models.CharField(max_length=10, unique=True)
-    email = models.EmailField(max_length=200, default="")
+    email = models.EmailField(max_length=200, null=True, blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
@@ -32,6 +32,14 @@ class AddedAmount(models.Model):
     amount = models.IntegerField()
     reference_number = models.CharField(max_length=40, unique=True)
     date_added = models.DateTimeField(default=timezone.now)
+    validated = models.BooleanField(default=False)
+
+    # def save(self):
+    #     if self.validated:
+    #         self.user.balance += self.amount
+    #         self.user.save()
+    #     self.save()
+
 
 class Bet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
