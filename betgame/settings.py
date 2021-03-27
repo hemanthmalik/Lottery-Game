@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import yaml
 
+yaml_file = open('creds.yaml', 'r')
+creds_yaml = yaml.load(yaml_file, Loader=yaml.SafeLoader)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,12 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '^8&$2hzkx2+-h_-r(q1n1kwycwp%inir6&%njbn!_o@)^1l91i'
+SECRET_KEY = creds_yaml['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = creds_yaml['DEBUG']
 
-ALLOWED_HOSTS = ['143.110.187.132']
+ALLOWED_HOSTS = creds_yaml['ALLOWED_HOSTS']
 
 
 # Application definition
@@ -82,9 +85,9 @@ WSGI_APPLICATION = 'betgame.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'betgame',
-        'USER': 'dev',
-        'PASSWORD': 'Simplepass@1234',
+        'NAME': creds_yaml['DB_NAME'],
+        'USER': creds_yaml['DB_USER'],
+        'PASSWORD': creds_yaml['DB_PASSWORD'],
         'HOST': 'localhost',
         'PORT': '',
     }

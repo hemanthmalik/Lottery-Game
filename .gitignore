@@ -1,2 +1,5 @@
 *.pyc
 **/migrations/*
+creds.yaml
+logs/
+bin/

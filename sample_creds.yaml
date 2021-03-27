@@ -1,0 +1,7 @@
+DEBUG: true
+DB_NAME: 'test'
+DB_USER: 'test'
+DB_PASSWORD: 'test'
+ALLOWED_HOSTS: 
+  - 'www.example.com'
+SECRET_KEY: 'secret key'
