@@ -53,6 +53,7 @@ class CustomAuthToken(ObtainAuthToken):
             'name': user.name,
             'email': user.email,
             'phone': user.phone,
+            'balance': user.balance,
             'token': token.key,
         })
 
@@ -67,3 +68,35 @@ class ValidateAddMoney(APIView):
         amount = data.get('amount')
         main_models.AddedAmount.objects.create(amount=amount, reference_number=ref_number, user=request.user)
         return Response({'success': True, 'detail': 'Payment validation in progress!'})
+
+class PlaceBet(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        data = request.data
+        bet_amount = data.get('bet_amount')
+        if request.user.balance < bet_amount:
+            return Response({'success': False, 'detail': 'Insufficient Balance!'})
+        bet_digit = data.get('bet_digit')
+        if ((not isinstance(bet_amount, int)) or (not isinstance(bet_digit, int)) or (bet_digit < 1) or (bet_digit in range(10, 111)) or (bet_digit > 999)):
+            return Response({'success': False, 'detail': 'Invalid Bet!'})
+        main_models.Bet.objects.create(amount=bet_amount, number=bet_digit, user=request.user)
+        request.user.balance -= bet_amount
+        request.user.save()
+        return Response({'success': True, 'detail': 'Bet has been placed!'})
+
+
+class GetWinnings(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        date = request.data.get('date')
+        try:
+            winnings = main_models.Win.objects.get(date=date)
+        except main_models.Win.DoesNotExist:
+            return Response({'success': False, 'detail': 'Winners not announced'})
+        winnings_list = list(map(lambda x: [x[0], int(x[1])], zip(range(2, 25, 2), winnings.winners.split(","))))
+        return Response({'success':True, 'winners': winnings_list})
+        
