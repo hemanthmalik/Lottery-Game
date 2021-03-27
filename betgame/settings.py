@@ -25,7 +25,7 @@ SECRET_KEY = '^8&$2hzkx2+-h_-r(q1n1kwycwp%inir6&%njbn!_o@)^1l91i'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['143.110.187.132']
 
 
 # Application definition
@@ -82,9 +82,9 @@ WSGI_APPLICATION = 'betgame.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'bettingdb',
-        'USER': 'tnameh',
-        'PASSWORD': 'Hello@1234',
+        'NAME': 'betgame',
+        'USER': 'dev',
+        'PASSWORD': 'Simplepass@1234',
         'HOST': 'localhost',
         'PORT': '',
     }

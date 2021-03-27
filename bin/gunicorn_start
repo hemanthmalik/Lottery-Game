@@ -1,0 +1,26 @@
+#!/bin/bash
+
+NAME="betgame"
+DIR=/home/dev/betgame
+USER=dev
+GROUP=dev
+WORKERS=3
+BIND=unix:/home/dev/betgame/run/gunicorn.sock
+DJANGO_SETTINGS_MODULE=betgame.settings
+DJANGO_WSGI_MODULE=betgame.wsgi
+LOG_LEVEL=error
+
+cd $DIR
+source ../envs/bg/bin/activate
+
+export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+export PYTHONPATH=$DIR:$PYTHONPATH
+
+exec ../envs/bg/bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
+  --name $NAME \
+  --workers $WORKERS \
+  --user=$USER \
+  --group=$GROUP \
+  --bind=$BIND \
+  --log-level=$LOG_LEVEL \
+  --log-file=-
