@@ -21,5 +21,17 @@ class MyUserAdmin(UserAdmin):
 
 # Register your models here.
 admin.site.register(User, MyUserAdmin)
-admin.site.register(main_models.AddedAmount)
-admin.site.register(main_models.Bet)
+@admin.register(main_models.AddedAmount)
+class AddedAmountAdmin(admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.concrete_fields]
+
+@admin.register(main_models.Bet)
+class BetAdmin(admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.concrete_fields]
+
+@admin.register(main_models.Win)
+class WinnsAdmin(admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.concrete_fields]

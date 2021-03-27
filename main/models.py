@@ -34,14 +34,18 @@ class AddedAmount(models.Model):
     date_added = models.DateTimeField(default=timezone.now)
     validated = models.BooleanField(default=False)
 
-    # def save(self):
-    #     if self.validated:
-    #         self.user.balance += self.amount
-    #         self.user.save()
-    #     self.save()
+    def save(self, *args, **kwargs):
+        if self.validated:
+            self.user.balance += self.amount
+            self.user.save()
+        super(AddedAmount, self).save(*args, **kwargs)
 
 
 class Bet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     number = models.IntegerField()
     amount = models.IntegerField()
+
+class Win(models.Model):
+    date = models.DateField(unique=True)
+    winners = models.CharField(max_length=50)
