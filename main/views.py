@@ -58,7 +58,7 @@ class CustomAuthToken(ObtainAuthToken):
         })
 
     
-class ValidateAddMoney(APIView):
+class AddMoney(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -66,7 +66,13 @@ class ValidateAddMoney(APIView):
         data = request.data
         ref_number = data.get('ref_number')
         amount = data.get('amount')
-        main_models.AddedAmount.objects.create(amount=amount, reference_number=ref_number, user=request.user)
+        amount = main_models.AddedAmount(amount=amount, reference_number=ref_number, user=request.user)
+        try:
+            amount.full_clean(validate_unique=True)
+            amount.save()
+        except ValidationError as e:
+            return Response({'success':False, 'detail': e})
+
         return Response({'success': True, 'detail': 'Payment validation in progress!'})
 
 class PlaceBet(APIView):
@@ -99,4 +105,12 @@ class GetWinnings(APIView):
             return Response({'success': False, 'detail': 'Winners not announced'})
         winnings_list = list(map(lambda x: [x[0], int(x[1])], zip(range(2, 25, 2), winnings.winners.split(","))))
         return Response({'success':True, 'winners': winnings_list})
+
+class GetBalance(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        balance = request.user.balance
+        return Response({'success':True, 'balance': balance})
         
